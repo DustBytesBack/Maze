@@ -59,20 +59,20 @@ class Cell:
             neighbors.append(left)
         return rd.choice(neighbors) if neighbors else None
 
-def remove_walls(current, next):
-    dx = current.x - next.x
+def remove_walls(node, next):
+    dx = node.x - next.x
     if dx == 1:
-        current.walls['left'] = False
+        node.walls['left'] = False
         next.walls['right'] = False
     elif dx == -1:
-        current.walls['right'] = False
+        node.walls['right'] = False
         next.walls['left'] = False
-    dy = current.y - next.y
+    dy = node.y - next.y
     if dy == 1:
-        current.walls['top'] = False
+        node.walls['top'] = False
         next.walls['bottom'] = False
     elif dy == -1:
-        current.walls['bottom'] = False
+        node.walls['bottom'] = False
         next.walls['top'] = False
 
 def create_graph():
@@ -104,15 +104,55 @@ def draw_path(path,color):
     pygame.display.flip()
     pygame.time.delay(DELAY)
 
-def heuristic(a, b):
+def heuristic(a, b):    #manhattan distance
     return abs(a[0] - b[0]) + abs(a[1] - b[1])
 
 def a_star(graph, start, goal):
-    pass
+    open_set = {start}  # The set of nodes to be evaluated
+    pq = [(0, start)]
 
-def dfs_traversal(graph,start,goal):
-    visited = set()
+    g_score = {node: float('inf') for node in graph.nodes}  # Cost from start along best known path.
+    g_score[start] = 0
+
+    f_score = {node: float('inf') for node in graph.nodes} # Estimated total cost from start to goal through y.
+    f_score[start] = heuristic(start, goal)
+
+    parent = {}
+    path = []
+
+    while pq:
+        _, node = pq.pop(0)
+
+        if node == goal:
+            path = []
+            while node in parent:
+                prev = parent[node]
+                path.append((prev, node))
+                node = prev
+            path.reverse()
+            return path
+
+        open_set.remove(node)   # Remove the node from the open set
+
+        for neighbor in graph.neighbors(node):
+            tentative_g_score = g_score[node] + 1   # Assuming the weight of each edge is 1
+
+            if tentative_g_score < g_score[neighbor]:
+                parent[neighbor] = node
+                g_score[neighbor] = tentative_g_score
+                f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)   # f(x) = g(x) + h(x)
+
+                if neighbor not in open_set:
+                    open_set.add(neighbor)
+                    pq.append((f_score[neighbor], neighbor))
+                    pq.sort()                                   # Sort the priority queue based on f_score
+                    draw_path([(node, neighbor)], 'green')
+
+    return []
+
+def dfs_traversal(graph, start, goal):
     stack = [start]
+    visited = set()
     parent = {}
     path_set = []
 
@@ -124,22 +164,29 @@ def dfs_traversal(graph,start,goal):
 
             if node in parent:
                 path_set.append((parent[node], node))
-                draw_path([(parent[node], node)],'orange')
+                draw_path([(parent[node], node)], 'green')
 
             if node == goal:
-                return visited,path_set
+                path = []
+                while node in parent:
+                    prev = parent[node]
+                    path.append((prev, node))
+                    node = prev
+                path.reverse()
+                return path
 
-            bactracked = False
+            backtracked = False                                       # Flag to check if backtracking occurred
             for neighbor in graph.neighbors(node):
-                if neighbor not in visited:
+                if neighbor not in visited:                           # If the neighbor is not visited , i.e backtracking occurs
                     stack.append(neighbor)
                     parent[neighbor] = node
-                    bactracked = True
+                    backtracked = True
+            
+            if not backtracked and node in parent:                     # If backtracking occurs, draw the path in purple
+                draw_path([(parent[node], node)], 'purple')
 
-            if not bactracked and node in parent:
-                draw_path([(parent[node], node)],'purple')
+    return []
 
-    return visited, []
 
 def bfs_traversal(graph,start,goal):
     visited = set()
@@ -155,7 +202,7 @@ def bfs_traversal(graph,start,goal):
 
             if node in parent:
                 path_set.append((parent[node], node))
-                draw_path([(parent[node], node)],'orange')
+                draw_path([(parent[node], node)],'green')
 
             if node == goal:
                 return visited,path_set
@@ -207,7 +254,7 @@ while True:
     if pygame.key.get_pressed()[pygame.K_SPACE] and graph_made:
         start = (0, 0)
         if ALGORITHM == 'DFS':
-            visited,path = dfs_traversal(G, start, (cols - 1, rows - 1))
+            path = dfs_traversal(G, start, (cols - 1, rows - 1))
         elif ALGORITHM == 'BFS':
             visited,path = bfs_traversal(G, start, (cols - 1, rows - 1))
         elif ALGORITHM == 'A*':
