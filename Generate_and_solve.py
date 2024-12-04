@@ -1,15 +1,15 @@
 import pygame
 import random as rd
 import networkx
+import miscFunc as mf
 
 RES = WIDTH, HEIGHT = 800, 800
-TILE = 50
+TILE = mf.get_tile_size()
+DELAY, LINEWIDTH, TICK = mf.compute_delay_and_width_tick(TILE)
 cols, rows = WIDTH // TILE, HEIGHT // TILE
-pygame.init()
 
-sc = pygame.display.set_mode(RES, pygame.RESIZABLE)
+sc = pygame.display.set_mode(RES)
 clock = pygame.time.Clock()
-
 
 class Cell:
     def __init__(self, x, y):
@@ -96,7 +96,7 @@ def dfs_traversal(graph,start,goal):
     visited = set()
     stack = [start]
     parent = {}
-    path_set = set()
+    path_set = []
 
     while stack:
         node = stack.pop()
@@ -110,42 +110,45 @@ def dfs_traversal(graph,start,goal):
 
                 pygame.draw.line(sc, pygame.Color('orange'),
                                  (px * TILE + TILE // 2, py * TILE + TILE // 2),
-                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), 20)
-                path_set.add((px, py))
+                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), LINEWIDTH)
+                path_set.append((parent[node], node))
                 pygame.display.flip()
-                pygame.time.delay(50)
+                pygame.time.delay(DELAY)
 
             if node == goal:
-                return visited
+                return visited,path_set
 
-            has_unvisited = False
+            bactracked = False
             for neighbor in graph.neighbors(node):
                 if neighbor not in visited:
                     stack.append(neighbor)
                     parent[neighbor] = node
-                    has_unvisited = True
+                    bactracked = True
 
-            if not has_unvisited and node in parent:
+            if not bactracked and node in parent:
                 px, py = parent[node]
                 x, y = node
                 pygame.draw.line(sc, pygame.Color('purple'),
                                  (px * TILE + TILE // 2, py * TILE + TILE // 2),
-                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), 20)
+                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), LINEWIDTH)
                 pygame.display.flip()
-                pygame.time.delay(100)
+                pygame.time.delay(DELAY)
 
-    return visited
+    return visited, path_set
 
 grid_cells = [Cell(x, y) for y in range(rows) for x in range(cols)]
 current_cell = grid_cells[0]
 stack = []
-
+sc.fill(pygame.Color('darkslategrey'))
+graph_made = False
+visited_edges = []
+path = []
 while True:
-    graph_made = False
-    sc.fill(pygame.Color('darkslategrey'))
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
+
+    # if not graph_made:    
     [cell.show() for cell in grid_cells]
     current_cell.visited = True
     current_cell.current_cell()
@@ -163,14 +166,21 @@ while True:
         G = create_graph()
         graph_made = True
 
-        for edge in G.edges:
-            x1, y1 = edge[0]
-            x2, y2 = edge[1]
-            pygame.draw.line(sc, pygame.Color('blue'), (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2), (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), 2)
+            # for edge in G.edges:
+            #     x1, y1 = edge[0]
+            #     x2, y2 = edge[1]
+            #     pygame.draw.line(sc, pygame.Color('blue'), (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2), (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), 2)
 
     if pygame.key.get_pressed()[pygame.K_SPACE] and graph_made:
         start = (0, 0)
-        visited = dfs_traversal(G, start, (cols - 1, rows - 1))
+        visited,path = dfs_traversal(G, start, (cols - 1, rows - 1))
 
+    for edges in path:
+        x1, y1 = edges[0]
+        x2, y2 = edges[1]
+        pygame.draw.line(sc, pygame.Color('orange'),
+                         (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2),
+                         (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), LINEWIDTH)
+        
     pygame.display.flip()
-    clock.tick(50)
+    clock.tick(TICK)

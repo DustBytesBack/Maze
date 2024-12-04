@@ -243,3 +243,5 @@ def start():
     WIN = pg.display.set_mode((WIDTH,WIDTH))
     pg.display.set_caption("Maze")
     main(WIN,WIDTH)
+
+start()
