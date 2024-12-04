@@ -92,6 +92,23 @@ def create_graph():
                 G.add_edge((cell.x, cell.y), (nx, ny))
     return G
 
+def draw_path(path,color):
+    for edges in path:
+        x1, y1 = edges[0]
+        x2, y2 = edges[1]
+        pygame.draw.line(sc, pygame.Color(color),
+                         (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2),
+                         (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), LINEWIDTH)
+        
+    pygame.display.flip()
+    pygame.time.delay(DELAY)
+
+def heuristic(a, b):
+    return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+def a_star(graph, start, goal):
+    pass
+
 def dfs_traversal(graph,start,goal):
     visited = set()
     stack = [start]
@@ -105,15 +122,8 @@ def dfs_traversal(graph,start,goal):
             visited.add(node)
 
             if node in parent:
-                px, py = parent[node]
-                x,y = node
-
-                pygame.draw.line(sc, pygame.Color('orange'),
-                                 (px * TILE + TILE // 2, py * TILE + TILE // 2),
-                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), LINEWIDTH)
                 path_set.append((parent[node], node))
-                pygame.display.flip()
-                pygame.time.delay(DELAY)
+                draw_path([(parent[node], node)],'orange')
 
             if node == goal:
                 return visited,path_set
@@ -126,15 +136,37 @@ def dfs_traversal(graph,start,goal):
                     bactracked = True
 
             if not bactracked and node in parent:
-                px, py = parent[node]
-                x, y = node
-                pygame.draw.line(sc, pygame.Color('purple'),
-                                 (px * TILE + TILE // 2, py * TILE + TILE // 2),
-                                 (x * TILE + TILE // 2, y * TILE + TILE // 2), LINEWIDTH)
-                pygame.display.flip()
-                pygame.time.delay(DELAY)
+                draw_path([(parent[node], node)],'purple')
+
+    return visited, []
+
+def bfs_traversal(graph,start,goal):
+    visited = set()
+    queue = [start]
+    parent = {}
+    path_set = []
+
+    while queue:
+        node = queue.pop(0)
+
+        if node not in visited:
+            visited.add(node)
+
+            if node in parent:
+                path_set.append((parent[node], node))
+                draw_path([(parent[node], node)],'orange')
+
+            if node == goal:
+                return visited,path_set
+            
+            for neighbor in graph.neighbors(node):
+                if neighbor not in visited:
+                    queue.append(neighbor)
+                    parent[neighbor] = node
 
     return visited, path_set
+
+
 
 grid_cells = [Cell(x, y) for y in range(rows) for x in range(cols)]
 current_cell = grid_cells[0]
@@ -174,13 +206,10 @@ while True:
     if pygame.key.get_pressed()[pygame.K_SPACE] and graph_made:
         start = (0, 0)
         visited,path = dfs_traversal(G, start, (cols - 1, rows - 1))
+        # visited,path = bfs_traversal(G, start, (cols - 1, rows - 1))
+        # path = a_star(G, start, (cols - 1, rows - 1))
 
-    for edges in path:
-        x1, y1 = edges[0]
-        x2, y2 = edges[1]
-        pygame.draw.line(sc, pygame.Color('orange'),
-                         (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2),
-                         (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), LINEWIDTH)
+    draw_path(path,'orange')
         
     pygame.display.flip()
     clock.tick(TICK)

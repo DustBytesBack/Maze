@@ -1,6 +1,6 @@
-import pygame
 import random as rd
-import os
+import tkinter as tk
+from tkinter import simpledialog
 
 def compute_delay_and_width_tick(TILE):
     
@@ -23,37 +23,23 @@ def compute_delay_and_width_tick(TILE):
 
     return int(delay), int(line_width),int(tick)
 
+def transform_tile(n:int):
+    if 10 <= n <= 100:
+        return 110 - n
+    else:
+        return False
+
 def get_tile_size():
-    os.environ['SDL_VIDEO_WINDOW_POS'] = "560,128"
-    pygame.init()
-    input_screen = pygame.display.set_mode((400, 200))
-    pygame.display.set_caption("Enter TILE Size")
-    font = pygame.font.Font(None, 40)
-    input_text = ""
-    running = True
-    while running:
-        input_screen.fill((30, 30, 30))  # Background color
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                exit()
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_RETURN:  # Press Enter to submit
-                    if input_text.isdigit() and int(input_text) > 0:
-                        return int(input_text)  # Return the valid TILE size
-                elif event.key == pygame.K_BACKSPACE:  # Allow backspace to edit
-                    input_text = input_text[:-1]
-                else:
-                    input_text += event.unicode  # Add typed character to input
+    root = tk.Tk()
+    root.withdraw()  # Hide the main window
+    tile_size = None
 
-        # Render input box
-        input_box = pygame.Rect(50, 80, 300, 50)
-        pygame.draw.rect(input_screen, (200, 200, 200), input_box, 2)
-        text_surface = font.render(input_text, True, (255, 255, 255))
-        input_screen.blit(text_surface, (input_box.x + 10, input_box.y + 10))
+    while tile_size is None:
+        tile_size_str = simpledialog.askstring("Input", "Enter TILE Size in a range of 10 to 100 :\n(as the value increases maze complexity increases)")
+        if tile_size_str is not None and tile_size_str.isdigit() and int(tile_size_str) > 0 and transform_tile(int(tile_size_str)):
+            tile_size = transform_tile(int(tile_size_str))
+        else:
+            tk.messagebox.showerror("Invalid input", "Please enter a positive integer.")
 
-        # Render instructions
-        instructions = font.render("Enter TILE Size", True, (255, 255, 255))
-        input_screen.blit(instructions, (10, 10))
-
-        pygame.display.flip()
+    root.destroy()
+    return tile_size
