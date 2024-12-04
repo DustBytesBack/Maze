@@ -4,7 +4,8 @@ import networkx
 import miscFunc as mf
 
 RES = WIDTH, HEIGHT = 800, 800
-TILE = mf.get_tile_size()
+TILE,ALGORITHM = mf.get_tile_size_and_algorithm()
+print(TILE,ALGORITHM)
 DELAY, LINEWIDTH, TICK = mf.compute_delay_and_width_tick(TILE)
 cols, rows = WIDTH // TILE, HEIGHT // TILE
 
@@ -205,9 +206,12 @@ while True:
 
     if pygame.key.get_pressed()[pygame.K_SPACE] and graph_made:
         start = (0, 0)
-        visited,path = dfs_traversal(G, start, (cols - 1, rows - 1))
-        # visited,path = bfs_traversal(G, start, (cols - 1, rows - 1))
-        # path = a_star(G, start, (cols - 1, rows - 1))
+        if ALGORITHM == 'DFS':
+            visited,path = dfs_traversal(G, start, (cols - 1, rows - 1))
+        elif ALGORITHM == 'BFS':
+            visited,path = bfs_traversal(G, start, (cols - 1, rows - 1))
+        elif ALGORITHM == 'A*':
+            path = a_star(G, start, (cols - 1, rows - 1))
 
     draw_path(path,'orange')
         

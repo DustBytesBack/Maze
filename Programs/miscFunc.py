@@ -29,10 +29,16 @@ def transform_tile(n:int):
     else:
         return False
 
-def get_tile_size():
+def get_tile_size_and_algorithm():
     root = tk.Tk()
     root.withdraw()  # Hide the main window
     tile_size = None
+    algorithm = None
+
+    def on_select_algo(algo):
+        nonlocal algorithm
+        algorithm = algo
+        algo_window.destroy()
 
     while tile_size is None:
         tile_size_str = simpledialog.askstring("Input", "Enter TILE Size in a range of 10 to 100 :\n(as the value increases maze complexity increases)")
@@ -41,5 +47,14 @@ def get_tile_size():
         else:
             tk.messagebox.showerror("Invalid input", "Please enter a positive integer.")
 
+    algo_window = tk.Toplevel(root)
+    algo_window.title("Select Algorithm")
+
+    tk.Button(algo_window, text="DFS", command=lambda: on_select_algo("DFS")).pack()
+    tk.Button(algo_window, text="BFS", command=lambda: on_select_algo("BFS")).pack()
+    tk.Button(algo_window, text="A*", command=lambda: on_select_algo("A*")).pack()
+
+    root.wait_window(algo_window)
     root.destroy()
-    return tile_size
+
+    return tile_size, algorithm
