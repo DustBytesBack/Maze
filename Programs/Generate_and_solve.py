@@ -3,62 +3,12 @@ import random as rd
 import networkx
 import miscFunc as mf
 import traversals as tr
+import Cell as cl
 
-RES = WIDTH, HEIGHT = 800, 800
-TILE,ALGORITHM = mf.get_tile_size_and_algorithm()
-print(TILE,ALGORITHM)
+cols, rows, sc, TILE, ALGORITHM = cl.return_maze_features()
 DELAY, LINEWIDTH, TICK = mf.compute_delay_and_width_tick(TILE)
-cols, rows = WIDTH // TILE, HEIGHT // TILE
 
-sc = pygame.display.set_mode(RES)
 clock = pygame.time.Clock()
-
-class Cell:
-    def __init__(self, x, y):
-        self.x, self.y = x, y
-        self.walls = {'top': True, 'right': True, 'bottom': True, 'left': True}   
-        self.visited = False
-
-
-    def show(self):
-        x, y = self.x * TILE, self.y * TILE
-        if self.visited:
-            pygame.draw.rect(sc, pygame.Color('black'), (x, y, TILE, TILE))
-
-        if self.walls['top']:
-            pygame.draw.line(sc, pygame.Color('white'), (x, y), (x + TILE, y), 2)
-        if self.walls['right']: 
-            pygame.draw.line(sc, pygame.Color('white'), (x + TILE, y), (x + TILE, y + TILE), 2) 
-        if self.walls['bottom']:
-            pygame.draw.line(sc, pygame.Color('white'), (x + TILE, y + TILE), (x, y + TILE), 2)
-        if self.walls['left']:
-            pygame.draw.line(sc, pygame.Color('white'), (x, y + TILE), (x, y), 2)
-    
-    def current_cell(self):
-        x, y = self.x * TILE, self.y * TILE
-        pygame.draw.rect(sc, pygame.Color('orange'), (x, y, TILE, TILE))
-    
-    def check_cell(self, x, y):
-        find_idx = lambda x, y: x + y * cols
-        if x < 0 or y < 0 or x > cols - 1 or y > rows - 1:
-            return False
-        return grid_cells[find_idx(x, y)]
-    
-    def check_neighbors(self):
-        neighbors = []
-        top = self.check_cell(self.x, self.y - 1)
-        right = self.check_cell(self.x + 1, self.y)
-        bottom = self.check_cell(self.x, self.y + 1)
-        left = self.check_cell(self.x - 1, self.y)
-        if top and not top.visited:
-            neighbors.append(top)
-        if right and not right.visited:
-            neighbors.append(right)
-        if bottom and not bottom.visited:
-            neighbors.append(bottom)
-        if left and not left.visited:
-            neighbors.append(left)
-        return rd.choice(neighbors) if neighbors else None
     
 def remove_walls(node, next):
     dx = node.x - next.x
@@ -94,16 +44,16 @@ def create_graph():
                 G.add_edge((cell.x, cell.y), (nx, ny))
     return G
 
-def draw_path(path,color):
-    for edges in path:
-        x1, y1 = edges[0]
-        x2, y2 = edges[1]
-        pygame.draw.line(sc, pygame.Color(color),
-                         (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2),
-                         (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), LINEWIDTH)
+# def draw_path(path,color):
+#     for edges in path:
+#         x1, y1 = edges[0]
+#         x2, y2 = edges[1]
+#         pygame.draw.line(sc, pygame.Color(color),
+#                          (x1 * TILE + TILE // 2, y1 * TILE + TILE // 2),
+#                          (x2 * TILE + TILE // 2, y2 * TILE + TILE // 2), LINEWIDTH)
         
-    pygame.display.flip()
-    pygame.time.delay(DELAY)
+#     pygame.display.flip()
+#     pygame.time.delay(DELAY)
 
 def maze_generator_dfs(grid_cells):
     current_cell = grid_cells[0]
@@ -128,8 +78,8 @@ def maze_generator_dfs(grid_cells):
         yield
 
 
-grid_cells = [Cell(x, y) for y in range(rows) for x in range(cols)]
 sc.fill(pygame.Color('darkslategrey'))
+grid_cells = cl.get_grid_cells()
 maze_generator = maze_generator_dfs(grid_cells)
 graph_made = False
 # visited_edges = [] ??
