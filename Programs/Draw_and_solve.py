@@ -104,14 +104,13 @@ def main(win,width):
     start = None
     end = None
 
-    run = True
     started = False
 
-    while run:
+    while True:
         draw(win,grid,ROWS,width)
         for event in pg.event.get():
             if event.type == pg.QUIT:
-                run = False
+                pg.quit()
             
             if started:
                 continue

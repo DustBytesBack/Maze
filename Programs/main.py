@@ -11,12 +11,12 @@ def main():
     DRAW:bool = False
     TILE, ALGO,GENALGO,FILE,DRAW = getMazeConfigurations()
     
-    if FILE is not None:
-        imageMazeSolver(FILE,ALGO)
+    if DRAW:
+        drawNsolve()
     elif GENALGO is not None and ALGO is not None and TILE is not None:
         generateNsolve(TILE, GENALGO, ALGO)
-    elif DRAW:
-        drawNsolve()
+    elif FILE is not None:
+        imageMazeSolver(FILE,ALGO)
 
 if __name__ == "__main__":
     main()

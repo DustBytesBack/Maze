@@ -3,7 +3,6 @@ import random as rd
 import networkx
 import miscFunc as mf
 import GenTraversals as tr
-#import Cell as cl
 
 TILE, cols, rows, DELAY, LINEWIDTH, TICK, sc, grid_cells = None, None, None, None, None, None, None, None
 RES = WIDTH, HEIGHT = 800, 800
@@ -217,7 +216,7 @@ def main(tile, GENALGO, ALGORITHM):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit()
+                pygame.quit()
         try:
             next(maze_generator)
         except StopIteration:

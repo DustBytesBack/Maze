@@ -3,20 +3,31 @@ import heapq
 import pygame
 import time
 
+def sleepNlinewidthCalc(cell_size):
+    if cell_size <= 5:
+        SLEEP_TIME = 0
+    else:
+        SLEEP_TIME = 1/(cell_size*2)
+    if cell_size <= 5:
+        LINEWIDTH = int(cell_size)
+    else:
+        LINEWIDTH = int(cell_size //2)
+    return SLEEP_TIME, LINEWIDTH
 
 # ------------------------ DFS Traversal ------------------------
 def draw_path(screen, path, color, cell_size):
     """Draw the path on the screen."""
+    SLEEP_TIME,LINEWIDTH = sleepNlinewidthCalc(cell_size)
     for edge in path:
         (x1, y1), (x2, y2) = edge
         pygame.draw.line(
             screen, color,
             (x1 * cell_size + cell_size // 2, y1 * cell_size + cell_size // 2),
             (x2 * cell_size + cell_size // 2, y2 * cell_size + cell_size // 2),
-            7
+            LINEWIDTH
         )
     pygame.display.flip()
-    time.sleep(0.02)
+    time.sleep(SLEEP_TIME)
 
 def dfs_traversal(graph, start, goal, screen, cell_size):
     """Perform DFS to find the path and visualize it."""

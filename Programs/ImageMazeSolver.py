@@ -1,11 +1,8 @@
-from collections import deque
-import heapq
 import pygame
 from PIL import Image
 import sys
-import time
 from Colors import *
-from ImageTraversalAlgo import dfs_traversal,bfs_traversal,a_star_traversal
+from ImageTraversalAlgo import dfs_traversal,bfs_traversal,a_star_traversal,sleepNlinewidthCalc
 
 # ------------------------ Load Maze Image ------------------------
 def load_image(image_path):
@@ -88,6 +85,7 @@ def highlight_nodes(screen, start_node, goal_node, cell_size):
 
 def draw_final_path(screen, final_path, cell_size):
     """Draw the final path on the screen."""
+    _,LINEWIDTH = sleepNlinewidthCalc(cell_size)
 
     for edge in final_path:
         (x1, y1), (x2, y2) = edge
@@ -95,7 +93,7 @@ def draw_final_path(screen, final_path, cell_size):
             screen, ORANGE,
             (x1 * cell_size + cell_size // 2, y1 * cell_size + cell_size // 2),
             (x2 * cell_size + cell_size // 2, y2 * cell_size + cell_size // 2),
-            4
+            LINEWIDTH
         )
 
 def display_maze(grid, graph,ALGO, cell_size=10):
@@ -104,6 +102,7 @@ def display_maze(grid, graph,ALGO, cell_size=10):
 
     window_size = 1000
     cell_size = calculate_cell_size(grid, window_size)
+    print("Cell Size: ",cell_size)
     screen_width = int(len(grid[0]) * cell_size)
     screen_height = int(len(grid) * cell_size)
 
@@ -117,7 +116,7 @@ def display_maze(grid, graph,ALGO, cell_size=10):
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                exit()
+                pygame.quit()
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left-click
                 mouse_x, mouse_y = event.pos
@@ -149,5 +148,5 @@ def display_maze(grid, graph,ALGO, cell_size=10):
 # ------------------------ Main ------------------------
 def main(image_path,ALGO):
     # image_path = "assets/100.bmp"
-    grid, graph, width, height = load_maze_image(image_path)
+    grid, graph,_,_ = load_maze_image(image_path)
     display_maze(grid, graph, ALGO, cell_size=10)
