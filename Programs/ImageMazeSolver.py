@@ -268,7 +268,7 @@ def display_maze(grid, graph, cell_size=10):
                     elif not goal_node:
                         goal_node = (clicked_x, clicked_y)
                         print("Goal Node selected: ",goal_node)
-                        final_path = bfs_traversal(graph, start_node, goal_node, screen, cell_size)
+                        final_path = a_star_traversal(graph, start_node, goal_node, screen, cell_size)
 
         draw_maze(screen, grid, cell_size)
         highlight_nodes(screen, start_node, goal_node, cell_size)

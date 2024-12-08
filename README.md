@@ -11,7 +11,8 @@ This project involves creating and solving mazes using various algorithms. The g
 ## Algorithms Used
 - **Depth-First Search (DFS)**
 - **Breadth-First Search (BFS)**
-- **A* Search**
+- **Kruskal's**
+- **A\* Search**
 
 ## Installation
 1. **Clone the repository:**
