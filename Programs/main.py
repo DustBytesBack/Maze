@@ -1,5 +1,5 @@
 from miscFunc import getMazeConfigurations
-# from GenerateNsolve import main as generateNsolve
+from GenerateNsolve import main as generateNsolve
 from Draw_and_solve import start as drawNsolve
 from ImageMazeSolver import main as imageMazeSolver
 
@@ -13,8 +13,8 @@ def main():
     
     if FILE is not None:
         imageMazeSolver(FILE,ALGO)
-    # elif GENALGO is not None and ALGO is not None and TILE is not None:
-    #     generateNsolve(TILE, ALGO, GENALGO)
+    elif GENALGO is not None and ALGO is not None and TILE is not None:
+        generateNsolve(TILE, GENALGO, ALGO)
     elif DRAW:
         drawNsolve()
 

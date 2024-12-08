@@ -3,12 +3,64 @@ import random as rd
 import networkx
 import miscFunc as mf
 import GenTraversals as tr
-import Cell as cl
+#import Cell as cl
 
-cols, rows, sc, TILE, ALGORITHM, GENALGO = cl.return_maze_features()
-DELAY, LINEWIDTH, TICK = mf.compute_delay_and_width_tick(TILE)
+TILE, cols, rows, DELAY, LINEWIDTH, TICK, sc, grid_cells = None, None, None, None, None, None, None, None
+RES = WIDTH, HEIGHT = 800, 800
+
 
 clock = pygame.time.Clock()
+
+class Cell:
+    def __init__(self, x, y):
+        self.x, self.y = x, y
+        self.walls = {'top': True, 'right': True, 'bottom': True, 'left': True}   
+        self.visited = False
+
+
+    def show(self):
+        x, y = self.x * TILE, self.y * TILE
+        if self.visited:
+            pygame.draw.rect(sc, pygame.Color('black'), (x, y, TILE, TILE))
+
+        if self.walls['top']:
+            pygame.draw.line(sc, pygame.Color('white'), (x, y), (x + TILE, y), 2)
+        if self.walls['right']: 
+            pygame.draw.line(sc, pygame.Color('white'), (x + TILE, y), (x + TILE, y + TILE), 2) 
+        if self.walls['bottom']:
+            pygame.draw.line(sc, pygame.Color('white'), (x + TILE, y + TILE), (x, y + TILE), 2)
+        if self.walls['left']:
+            pygame.draw.line(sc, pygame.Color('white'), (x, y + TILE), (x, y), 2)
+        
+    def highlight(self, color):
+        x, y = self.x * TILE, self.y * TILE
+        pygame.draw.rect(sc, color, (x + 2, y + 2, TILE - 4, TILE - 4))
+    
+    def current_cell(self):
+        x, y = self.x * TILE, self.y * TILE
+        pygame.draw.rect(sc, pygame.Color('orange'), (x, y, TILE, TILE))
+    
+    def check_cell(self, x, y):
+        find_idx = lambda x, y: x + y * cols
+        if x < 0 or y < 0 or x > cols - 1 or y > rows - 1:
+            return False
+        return grid_cells[find_idx(x, y)]
+    
+    def check_neighbors(self):
+        neighbors = []
+        top = self.check_cell(self.x, self.y - 1)
+        right = self.check_cell(self.x + 1, self.y)
+        bottom = self.check_cell(self.x, self.y + 1)
+        left = self.check_cell(self.x - 1, self.y)
+        if top and not top.visited:
+            neighbors.append(top)
+        if right and not right.visited:
+            neighbors.append(right)
+        if bottom and not bottom.visited:
+            neighbors.append(bottom)
+        if left and not left.visited:
+            neighbors.append(left)
+        return rd.choice(neighbors) if neighbors else None
 
     
 def remove_walls(node, next):
@@ -145,15 +197,20 @@ def kruskal_maze(grid_cells):
     pygame.display.flip()
 
 """Make this whole thing a function,for eg. main()"""
-def main():
-    
-
+def main(tile, GENALGO, ALGORITHM): 
+    global TILE, cols, rows, DELAY, LINEWIDTH, TICK, sc, grid_cells
+    TILE = tile
+    DELAY, LINEWIDTH, TICK = mf.compute_delay_and_width_tick(TILE)
+    cols, rows = WIDTH // TILE, HEIGHT // TILE
+    grid_cells = [Cell(x, y) for y in range(rows) for x in range(cols)]
+    sc = pygame.display.set_mode(RES)
     sc.fill(pygame.Color('darkslategrey'))
-    grid_cells = cl.get_grid_cells()
     if GENALGO == 'DFS':
         maze_generator = maze_generator_dfs(grid_cells)
     elif GENALGO == 'Kruskal':
         maze_generator = kruskal_maze(grid_cells)
+    else:
+        raise ValueError('Invalid generation algorithm')
     graph_made = False
     path = []
     
