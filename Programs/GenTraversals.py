@@ -65,10 +65,15 @@ def bfs_traversal(graph,start,goal, TILE, DELAY, LINEWIDTH, sc):
             visited.add(node)
 
             if node in parent:
-                path_set.append((parent[node], node))
+                # path_set.append((parent[node], node))
                 draw_path([(parent[node], node)],'green', TILE, DELAY, LINEWIDTH, sc)
 
             if node == goal:
+                current = goal
+                while current != start:
+                    path_set.append((parent[current], current))
+                    current = parent[current]
+                path_set.reverse()
                 return visited,path_set
             
             for neighbor in graph.neighbors(node):

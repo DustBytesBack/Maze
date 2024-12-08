@@ -49,6 +49,8 @@ def getMazeConfigurations() -> tuple:
     tile_size = 50
     algorithm = None
     genalgo = None
+    drawMaze = False
+    filepath = None
 
     # Function to update slider value display
     def update_slider_label(event):
@@ -63,25 +65,35 @@ def getMazeConfigurations() -> tuple:
         nonlocal genalgo
         genalgo = algo
 
+    def setdrawMaze():
+        nonlocal drawMaze
+        drawMaze = True
+        root.quit()
+
     # Function to handle submission
     def submit_selection():
         nonlocal tile_size
         tile_size = transform_tile(int(tile_size_slider.get()))
         if not algorithm:
             messagebox.showerror("Error", "Please select an algorithm to Solve the Maze.")
+        elif not genalgo:
+            messagebox.showerror("Error", "Please select an algorithm to Generate the Maze.")
         else:
             root.quit()
 
     def browse_file():
-        file_path = filedialog.askopenfilename(
+        nonlocal filepath
+        filepath = filedialog.askopenfilename(
             title="Select a Maze File",
             filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.bmp;*.gif"), ("All Files", "*.*")]
         )
-        if file_path:  # If user selected a file
-            input_var.set(file_path)  # Display the file path in the input field
+        if filepath:  # If user selected a file
+            input_var.set(filepath)  # Display the file path in the input field
             toggle_maze_generator()
     
     def clear_file():
+        nonlocal filepath
+        filepath = None
         input_var.set("")
         toggle_maze_generator()
 
@@ -159,10 +171,17 @@ def getMazeConfigurations() -> tuple:
 
     ttk.Button(generator_frame, text="Generate maze!", command=submit_selection).grid(row=4, column=0, columnspan=3, pady=10)
 
+    # Draw Maze Section
+    draw_frame = ttk.LabelFrame(root, text="Draw maze", padding=10)
+    draw_frame.pack(fill="x", padx=10, pady=10)
+
+    ttk.Label(draw_frame, text="Want to Draw your own Maze ?").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+    ttk.Button(draw_frame, text="Draw", command=setdrawMaze).grid(row=0, column=1, padx=5, pady=5)
+
     root.mainloop()
     root.destroy()
 
-    return tile_size, algorithm, genalgo, input_var.get()
+    return tile_size, algorithm, genalgo, filepath,drawMaze
 
 if '__main__' == __name__:
     getMazeConfigurations()

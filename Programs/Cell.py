@@ -2,7 +2,7 @@ import miscFunc as mf
 import pygame
 import random as rd    
 
-TILE, ALGO,GENALGO,_ = mf.getMazeConfigurations()
+TILE, ALGO,GENALGO,_,_ = mf.getMazeConfigurations()
 RES = WIDTH, HEIGHT = 800, 800
 cols, rows = WIDTH // TILE, HEIGHT // TILE
 sc = pygame.display.set_mode(RES)
@@ -65,3 +65,4 @@ def get_grid_cells():
 
 def return_maze_features():
     return cols, rows, sc, TILE, ALGO,GENALGO
+    # return cols, rows, sc
