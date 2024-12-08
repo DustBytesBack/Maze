@@ -44,7 +44,7 @@ def getMazeConfigurations() -> tuple:
     root.geometry("500x600")
     root.resizable(False, False)
     style = ttk.Style() # Style object for customizing widgets
-    style.theme_use("classic") 
+    style.theme_use("xpnative") 
 
     tile_size = 50
     algorithm = None

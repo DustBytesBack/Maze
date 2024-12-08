@@ -1,6 +1,6 @@
 from miscFunc import getMazeConfigurations
 # from GenerateNsolve import main as generateNsolve
-from Draw_and_solve import main as drawNsolve
+from Draw_and_solve import start as drawNsolve
 from ImageMazeSolver import main as imageMazeSolver
 
 def main():
@@ -15,8 +15,8 @@ def main():
         imageMazeSolver(FILE,ALGO)
     # elif GENALGO is not None and ALGO is not None and TILE is not None:
     #     generateNsolve(TILE, ALGO, GENALGO)
-    elif ALGO is not None and DRAW:
-        drawNsolve(ALGO)
+    elif DRAW:
+        drawNsolve()
 
 if __name__ == "__main__":
     main()

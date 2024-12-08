@@ -121,7 +121,9 @@ def main(win,width):
                 if pos[0] > width or pos[1] > width:
                     continue
                 row,col = get_clicked_pos(pos,ROWS,width)
-                spot = grid[row][col] 
+                if row >= ROWS or col >= ROWS:
+                    continue
+                spot = grid[row][col]
                 if not start and spot!= end:
                     start = spot
                     start.make_start()
