@@ -40,6 +40,15 @@ def getMazeConfigurations() -> tuple:
         file_path (str): Path to the selected maze image.
     """
     root = tk.Tk()
+    def onClose():
+        nonlocal tile_size, algorithm, genalgo, filepath,drawMaze
+        tile_size, algorithm, genalgo, filepath,drawMaze = None, None, None, None,False
+
+        root.quit()
+        root.destroy()
+
+    root.protocol("WM_DELETE_WINDOW", onClose)
+
     root.title("Maze Pathfinder")
     root.geometry("500x600")
     root.resizable(False, False)
@@ -112,8 +121,10 @@ def getMazeConfigurations() -> tuple:
         input_value = input_var.get().strip()
         if input_value:
             generator_frame.pack_forget()
+            draw_frame.pack_forget()
         else:
             generator_frame.pack(fill="x", padx=10, pady=10)
+            draw_frame.pack(fill="x", padx=10, pady=10)
 
     # Image Maze Solver Section
     solver_frame = ttk.LabelFrame(root, text="Maze solver", padding=10)
@@ -137,13 +148,13 @@ def getMazeConfigurations() -> tuple:
     traversal_frame = ttk.LabelFrame(root, text="Traverse method", padding=10)
     traversal_frame.pack(fill="x", padx=10, pady=10)
 
-    ttk.Label(traversal_frame, text="Traverse method:").grid(row=1, column=0, sticky="w", pady=5)
+    ttk.Label(traversal_frame, text="Traverse method:").grid(row=0, column=0, sticky="w",padx=5, pady=5)
 
     algo_var = tk.StringVar(value=None)
-    ttk.Radiobutton(traversal_frame, text="DFS", variable=algo_var, value="DFS", command=lambda: set_algorithm("DFS")).grid(row=2, column=0, sticky="w")
-    ttk.Radiobutton(traversal_frame, text="BFS", variable=algo_var, value="BFS", command=lambda: set_algorithm("BFS")).grid(row=2, column=1, sticky="w")
-    ttk.Radiobutton(traversal_frame, text="Dijkstra", variable=algo_var, value="Dijkstra", command=lambda: set_algorithm("Dijkstra")).grid(row=2, column=2, sticky="w")
-    ttk.Radiobutton(traversal_frame, text="A*", variable=algo_var, value="A*", command=lambda: set_algorithm("A*")).grid(row=2, column=3, sticky="w")
+    ttk.Radiobutton(traversal_frame, text="DFS", variable=algo_var, value="DFS", command=lambda: set_algorithm("DFS")).grid(row=1, column=0, sticky="w")
+    ttk.Radiobutton(traversal_frame, text="BFS", variable=algo_var, value="BFS", command=lambda: set_algorithm("BFS")).grid(row=1, column=1, sticky="w",padx=100)
+    # ttk.Radiobutton(traversal_frame, text="Dijkstra", variable=algo_var, value="Dijkstra", command=lambda: set_algorithm("Dijkstra")).grid(row=2, column=2, sticky="w")
+    ttk.Radiobutton(traversal_frame, text="A*", variable=algo_var, value="A*", command=lambda: set_algorithm("A*")).grid(row=1, column=2, sticky="w")
 
     # Maze Generator Section
     generator_frame = ttk.LabelFrame(root, text="Maze generator", padding=10)
@@ -155,6 +166,7 @@ def getMazeConfigurations() -> tuple:
     genalgo_var = tk.StringVar(value=None)
     ttk.Radiobutton(generator_frame, text="DFS", variable=genalgo_var, value="DFS", command=lambda: setGenAlgo("DFS")).grid(row=1, column=0, sticky="w")
     ttk.Radiobutton(generator_frame, text="Kruskal", variable=genalgo_var, value="Kruskal", command=lambda: setGenAlgo("Kruskal")).grid(row=1, column=1, sticky="w")
+    ttk.Radiobutton(generator_frame, text="Prim", variable=genalgo_var, value="Prim", command=lambda: setGenAlgo("Prim")).grid(row=1, column=2, sticky="w")
 
     ttk.Label(generator_frame, text="Maze size:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
 
@@ -179,7 +191,10 @@ def getMazeConfigurations() -> tuple:
     ttk.Button(draw_frame, text="Draw", command=setdrawMaze).grid(row=0, column=1, padx=5, pady=5)
 
     root.mainloop()
-    root.destroy()
+    try:
+        root.destroy()
+    except tk.TclError:
+        pass
 
     return tile_size, algorithm, genalgo, filepath,drawMaze
 

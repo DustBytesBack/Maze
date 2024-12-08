@@ -100,7 +100,7 @@ def display_maze(grid, graph,ALGO, cell_size=10):
     """Display the maze grid, visualize graph, and allow selecting start and goal nodes."""
     pygame.init()
 
-    window_size = 1000
+    window_size = 1020
     cell_size = calculate_cell_size(grid, window_size)
     print("Cell Size: ",cell_size)
     screen_width = int(len(grid[0]) * cell_size)
@@ -117,6 +117,7 @@ def display_maze(grid, graph,ALGO, cell_size=10):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                return
 
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:  # Left-click
                 mouse_x, mouse_y = event.pos

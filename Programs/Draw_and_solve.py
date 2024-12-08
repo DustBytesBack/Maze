@@ -111,6 +111,7 @@ def main(win,width):
         for event in pg.event.get():
             if event.type == pg.QUIT:
                 pg.quit()
+                return
             
             if started:
                 continue

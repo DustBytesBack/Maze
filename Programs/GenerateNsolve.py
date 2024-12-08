@@ -96,7 +96,7 @@ def create_graph(grid_cells):
                 G.add_edge((cell.x, cell.y), (nx, ny))
     return G
 
-def maze_generator_dfs(grid_cells):
+def randomisesd_dfs(grid_cells):
     current_cell = grid_cells[0]
     stack = []
     
@@ -195,6 +195,77 @@ def kruskal_maze(grid_cells):
         cell.show()  # Draw the final grid without highlights
     pygame.display.flip()
 
+def prim_maze(grid_cells):
+    edges = []  # List to store edges (walls)
+    visited = set()  # Set to track visited cells
+
+    # Start from a random cell
+    start_cell = rd.choice(grid_cells)  # Start with a random cell
+    visited.add((start_cell.x, start_cell.y))
+
+    # Function to add walls of a given cell to the edge list
+    def add_walls(cell):
+        x, y = cell.x, cell.y
+        neighbors = [
+            ((x, y), (x, y - 1)),  # Top
+            ((x, y), (x + 1, y)),  # Right
+            ((x, y), (x, y + 1)),  # Bottom
+            ((x, y), (x - 1, y)),  # Left
+        ]
+        for edge in neighbors:
+            (x1, y1), (x2, y2) = edge
+            # Add edges if neighbor is in bounds and not visited
+            if 0 <= x2 < cols and 0 <= y2 < rows and (x2, y2) not in visited:
+                edges.append(edge)
+
+    # Add initial walls from the starting cell
+    add_walls(start_cell)
+
+    # While edges are available, continue creating the maze
+    while edges:
+        # Shuffle edges to randomize selection
+        rd.shuffle(edges)
+
+        # Randomly select and remove an edge from the list
+        (x1, y1), (x2, y2) = edges.pop()
+
+        # Check if the neighbor cell has not been visited
+        if (x2, y2) not in visited:
+            # Mark the neighbor cell as visited
+            visited.add((x2, y2))
+
+            # Remove the wall between the current cell and the neighbor
+            current = grid_cells[x1 + y1 * cols]
+            neighbor = grid_cells[x2 + y2 * cols]
+
+            current.visited = True
+            neighbor.visited = True
+
+            remove_walls(current, neighbor)
+
+            # Add the neighbor's walls to the edges list
+            add_walls(neighbor)
+
+            # Visualization (dynamic maze generation)
+            sc.fill(pygame.Color('darkslategrey'))  # Clear screen
+            for cell in grid_cells:
+                cell.show()  # Draw all cells
+            current.highlight(pygame.Color('orange'))  # Highlight current cell
+            neighbor.highlight(pygame.Color('orange'))  # Highlight the newly visited cell
+
+            pygame.display.flip()
+            pygame.time.delay(DELAY)
+
+            yield  # Pause to visualize the maze generation
+
+    # Final visualization (clean up without highlights)
+    sc.fill(pygame.Color('darkslategrey'))
+    for cell in grid_cells:
+        cell.show()
+    pygame.display.flip()
+
+  # Pause and allow resumption
+
 """Make this whole thing a function,for eg. main()"""
 def main(tile, GENALGO, ALGORITHM): 
     global TILE, cols, rows, DELAY, LINEWIDTH, TICK, sc, grid_cells
@@ -204,12 +275,16 @@ def main(tile, GENALGO, ALGORITHM):
     grid_cells = [Cell(x, y) for y in range(rows) for x in range(cols)]
     sc = pygame.display.set_mode(RES)
     sc.fill(pygame.Color('darkslategrey'))
+
     if GENALGO == 'DFS':
-        maze_generator = maze_generator_dfs(grid_cells)
+        maze_generator = randomisesd_dfs(grid_cells)
     elif GENALGO == 'Kruskal':
         maze_generator = kruskal_maze(grid_cells)
+    elif GENALGO == 'Prim':
+        maze_generator = prim_maze(grid_cells)
     else:
         raise ValueError('Invalid generation algorithm')
+    
     graph_made = False
     path = []
     
@@ -217,6 +292,7 @@ def main(tile, GENALGO, ALGORITHM):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                return
         try:
             next(maze_generator)
         except StopIteration:
