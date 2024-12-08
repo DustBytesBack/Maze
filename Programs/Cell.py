@@ -2,7 +2,7 @@ import miscFunc as mf
 import pygame
 import random as rd    
 
-TILE, ALGO,_ = mf.getMazeConfigurations()
+TILE, ALGO,GENALGO,_ = mf.getMazeConfigurations()
 RES = WIDTH, HEIGHT = 800, 800
 cols, rows = WIDTH // TILE, HEIGHT // TILE
 sc = pygame.display.set_mode(RES)
@@ -27,6 +27,10 @@ class Cell:
             pygame.draw.line(sc, pygame.Color('white'), (x + TILE, y + TILE), (x, y + TILE), 2)
         if self.walls['left']:
             pygame.draw.line(sc, pygame.Color('white'), (x, y + TILE), (x, y), 2)
+        
+    def highlight(self, color):
+        x, y = self.x * TILE, self.y * TILE
+        pygame.draw.rect(sc, color, (x + 2, y + 2, TILE - 4, TILE - 4))
     
     def current_cell(self):
         x, y = self.x * TILE, self.y * TILE
@@ -60,4 +64,4 @@ def get_grid_cells():
     return grid_cells
 
 def return_maze_features():
-    return cols, rows, sc, TILE, ALGO
+    return cols, rows, sc, TILE, ALGO,GENALGO

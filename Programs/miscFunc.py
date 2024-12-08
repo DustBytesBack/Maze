@@ -6,7 +6,7 @@ from tkinter import ttk, messagebox, filedialog
 def compute_delay_and_width_tick(TILE) -> tuple:
     
     if TILE < 15:
-        return 0
+        delay = 0
     else:
         m = 40 / (7*4)
         c = -600 / (7*4)
@@ -48,6 +48,7 @@ def getMazeConfigurations() -> tuple:
 
     tile_size = 50
     algorithm = None
+    genalgo = None
 
     # Function to update slider value display
     def update_slider_label(event):
@@ -57,6 +58,10 @@ def getMazeConfigurations() -> tuple:
     def set_algorithm(algo):
         nonlocal algorithm
         algorithm = algo
+
+    def setGenAlgo(algo):
+        nonlocal genalgo
+        genalgo = algo
 
     # Function to handle submission
     def submit_selection():
@@ -132,25 +137,32 @@ def getMazeConfigurations() -> tuple:
     generator_frame = ttk.LabelFrame(root, text="Maze generator", padding=10)
     generator_frame.pack(fill="x", padx=10, pady=10)
 
-    ttk.Label(generator_frame, text="Maze size:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+    ttk.Label(generator_frame, text="Generation Algorithm:").grid(row=0, column=0, sticky="w", padx=5, pady=5)
+
+    # Genaration Algorithm Selection
+    genalgo_var = tk.StringVar(value=None)
+    ttk.Radiobutton(generator_frame, text="DFS", variable=genalgo_var, value="DFS", command=lambda: setGenAlgo("DFS")).grid(row=1, column=0, sticky="w")
+    ttk.Radiobutton(generator_frame, text="Kruskal", variable=genalgo_var, value="Kruskal", command=lambda: setGenAlgo("Kruskal")).grid(row=1, column=1, sticky="w")
+
+    ttk.Label(generator_frame, text="Maze size:").grid(row=2, column=0, sticky="w", padx=5, pady=5)
 
     tile_size_slider = ttk.Scale(generator_frame, from_=10, to=100, orient="horizontal", length=300)
     tile_size_slider.set(tile_size)
-    tile_size_slider.grid(row=1, column=0, columnspan=2, padx=10, pady=5)
+    tile_size_slider.grid(row=3, column=0, columnspan=2, padx=10, pady=5)
 
     slider_label = ttk.Label(generator_frame, text=str(tile_size))
-    slider_label.grid(row=1, column=2, padx=5, pady=5)
+    slider_label.grid(row=3, column=2, padx=5, pady=5)
     tile_size_slider.bind("<Motion>", update_slider_label)
     style.map("TScale",
           background=[('active', 'black'), ('!active', 'grey')]  # Active state vs inactive state color change
           )
 
-    ttk.Button(generator_frame, text="Generate maze!", command=submit_selection).grid(row=2, column=0, columnspan=3, pady=10)
+    ttk.Button(generator_frame, text="Generate maze!", command=submit_selection).grid(row=4, column=0, columnspan=3, pady=10)
 
     root.mainloop()
     root.destroy()
 
-    return tile_size, algorithm, input_var.get()
+    return tile_size, algorithm, genalgo, input_var.get()
 
 if '__main__' == __name__:
     getMazeConfigurations()
